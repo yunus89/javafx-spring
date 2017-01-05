@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<AnchorPane id="AnchorPane" prefHeight="324.0" prefWidth="296.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65" fx:controller="com.yunus.javafx.spring.AddUpdateCustomerController">
+   <children>
+      <Button fx:id="btnSave" layoutX="230.0" layoutY="285.0" mnemonicParsing="false" text="Save" />
+      <Button fx:id="btnCancel" layoutX="162.0" layoutY="285.0" mnemonicParsing="false" text="Cancel" />
+      <TextField fx:id="txtFirstName" layoutX="27.0" layoutY="96.0" prefHeight="25.0" prefWidth="240.0" promptText="First Name" />
+      <TextField fx:id="txtSecondName" layoutX="27.0" layoutY="146.0" prefHeight="25.0" prefWidth="240.0" promptText="Second Name" />
+      <TextField fx:id="txtPhone" layoutX="27.0" layoutY="195.0" prefHeight="25.0" prefWidth="240.0" promptText="Phone" />
+      <Text layoutX="27.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add Cusomer Modal" textAlignment="CENTER" wrappingWidth="240.0000069141388">
+         <font>
+            <Font name="Times New Roman Bold" size="22.0" />
+         </font>
+      </Text>
+   </children>
+</AnchorPane>
