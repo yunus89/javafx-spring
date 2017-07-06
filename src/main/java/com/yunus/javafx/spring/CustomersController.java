@@ -5,10 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,10 +16,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,14 +37,13 @@ public class CustomersController implements Initializable {
     private TableColumn<Customer, String> clmPhone;
     @FXML
     private Button addCustomer;
-
-    private final ObservableList<Customer> customerList = FXCollections.observableArrayList();
-    private final ListProperty<Customer> customerListProperty = new SimpleListProperty<>();
     
     @Autowired
     protected AnnotationConfigApplicationContext applicationContext;
     @Autowired
     protected Stage primaryStage;
+    @Autowired
+    private CustomerDataModel customerDataModel;
     
     /**
      * Initializes the controller class.
@@ -56,16 +53,35 @@ public class CustomersController implements Initializable {
         clmFirstName.setCellValueFactory(new PropertyValueFactory("firstName"));
         clmSecondName.setCellValueFactory(new PropertyValueFactory("secondName"));
         clmPhone.setCellValueFactory(new PropertyValueFactory("phone"));
-        customerListProperty.set(customerList);
-        tblCustomers.itemsProperty().bind(customerListProperty);
         addCustomer.setOnAction(this::addCustomerActionEvent);
+        tblCustomers.setItems(customerDataModel.getCustomerList());
+        tblCustomers.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldSelection, newSelection) -> customerDataModel.setCurrentSelectedCustomer(newSelection));
+        customerDataModel.newCustomerProperty().addListener((obs, oldCustomer, newCustomer) -> {
+            if( newCustomer != null ){
+                System.out.println("New route added");
+                System.out.println(newCustomer);
+            }
+        });
         
-        customerList.add(new Customer(1, "Name 1", "Second 1", "001"));
-        customerList.add(new Customer(2, "Name 2", "Second 2", "002"));
-        customerList.add(new Customer(1, "Name 3", "Second 3", "003"));
-        customerList.add(new Customer(1, "Name 4", "Second 4", "004"));
-        
+        customerDataModel.getCustomerList().addListener(new ListChangeListener<Customer>() {
+            @Override
+            public void onChanged(ListChangeListener.Change<? extends Customer> c) {
+                while(c.next()){
+                    if(c.wasAdded()){
+                        System.out.println("======================================");
+                        for(Customer customer: c.getAddedSubList() ){
+                            System.out.println("customer "+customer.getFirstName());
+                        }
+                        System.out.println("======================================");
+                    }
+                }
+            }
+        });
     }    
+    
+    @PostConstruct
+    public void loadCustomers(){ customerDataModel.loadCustomers(); }
     
     private void addCustomerActionEvent(ActionEvent event){
         try {
@@ -84,10 +100,8 @@ public class CustomersController implements Initializable {
         }
     }
     
-    @EventListener
-    public void addCustomerEventListener(AddCustomerEvent addCustomerEvent){
-        System.out.println("Heey");
-        customerList.add(addCustomerEvent.getCustomer());
-        customerList.add(new Customer(1, "Name 5", "Second 5", "005"));
+    @PreDestroy
+    public void destroyCustomerController(){
+        System.out.println("CustomersController destroyed");
     }
 }
